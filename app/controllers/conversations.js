@@ -8,7 +8,7 @@ module.exports = function (controller) {
   })
 
   // user said send
-  controller.hears(['Send'], 'message_received', function (bot, message) {
+  controller.hears(['Send'], 'facebook_postback', function (bot, message) {
     // start conversation - picture - des - loc
     bot.reply(message, 'Hey there, upload a picture of the food, amigo.')
   })
