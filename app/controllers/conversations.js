@@ -7,9 +7,15 @@ module.exports = function (controller) {
     bot.reply(message, 'Welcome, friend')
   })
 
-  // user said hello
-  controller.hears(['hello'], 'message_received', function (bot, message) {
-    bot.reply(message, 'Hey there.')
+  // user said send
+  controller.hears(['Send'], 'message_received', function (bot, message) {
+    // start conversation - picture - des - loc
+    bot.reply(message, 'Hey there, upload a picture of the food, amigo.')
+  })
+
+  // user said report
+  controller.hears(['Report'], 'message_received', function (bot, message) {
+    bot.reply(message, 'Hey there amigo, what is the id of that foul message?')
   })
 
   // user says anything else

@@ -10,7 +10,8 @@ var controller = Botkit.facebookbot({
   debug: true,
   access_token: process.env.FACEBOOK_PAGE_TOKEN,
   verify_token: process.env.FACEBOOK_VERIFY_TOKEN,
-  storage: db
+  storage: db,
+  receive_via_postback: true // treat all facebook_postback type as text
 })
 
 var bot = controller.spawn({})
@@ -51,7 +52,7 @@ var handler = function (obj) {
         }
         // When a user clicks on "Send to Messenger"
         else if (facebook_message.optin ||
-                (facebook_message.postback && facebook_message.postback.payload === 'optin')) {
+          (facebook_message.postback && facebook_message.postback.payload === 'optin')) {
           message = {
             optin: facebook_message.optin,
             user: facebook_message.sender.id,
@@ -60,10 +61,10 @@ var handler = function (obj) {
           }
 
             // save if user comes from "Send to Messenger"
-          create_user_if_new(facebook_message.sender.id, facebook_message.timestamp)
+            create_user_if_new(facebook_message.sender.id, facebook_message.timestamp)
 
-          controller.trigger('facebook_optin', [bot, message])
-        }
+            controller.trigger('facebook_optin', [bot, message])
+          }
         // clicks on a postback action in an attachment
         else if (facebook_message.postback) {
           // trigger BOTH a facebook_postback event
