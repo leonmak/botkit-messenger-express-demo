@@ -48,12 +48,12 @@ module.exports = function (controller) {
       {
         'type': 'postback',
         'title': 'Send',
-        'payload': '/send'
+        'payload': 'send'
       },
       {
         'type': 'postback',
         'title': 'Report',
-        'payload': '/report'
+        'payload': 'report'
       }
     ]
   }

@@ -10,6 +10,7 @@ var controller = Botkit.facebookbot({
   debug: true,
   access_token: process.env.FACEBOOK_PAGE_TOKEN,
   verify_token: process.env.FACEBOOK_VERIFY_TOKEN,
+  receive_via_postback: true,
   storage: db
 })
 
@@ -75,7 +76,6 @@ var handler = function (obj) {
             channel: facebook_message.sender.id,
             timestamp: facebook_message.timestamp
           }
-
           controller.trigger('facebook_postback', [bot, message])
 
           message = {
@@ -84,7 +84,6 @@ var handler = function (obj) {
             channel: facebook_message.sender.id,
             timestamp: facebook_message.timestamp
           }
-
           controller.receiveMessage(bot, message)
         }
         // message delivered callback
