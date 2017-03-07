@@ -7,7 +7,7 @@ var mongoUri = process.env.MONGODB_URI || 'mongodb://localhost/botkit-demo'
 var db = require('../../config/db')({mongoUri: mongoUri})
 
 var controller = Botkit.facebookbot({
-  debug: true,
+  debug: true, log: true,
   access_token: process.env.FACEBOOK_PAGE_TOKEN,
   verify_token: process.env.FACEBOOK_VERIFY_TOKEN,
   receive_via_postback: true,
@@ -15,6 +15,7 @@ var controller = Botkit.facebookbot({
 })
 
 var bot = controller.spawn({})
+var tempConvo = {}
 
 // SETUP
 require('./facebook_setup')(controller)
@@ -47,12 +48,19 @@ var handler = function (obj) {
 
           // save if user comes from m.me adress or Facebook search
           create_user_if_new(facebook_message.sender.id, facebook_message.timestamp)
-
-          controller.receiveMessage(bot, message)
+          if (message.attachments) {
+            switch (message.attachments[0].type) {
+              case 'image': controller.trigger('facebook_image', [bot, message, tempConvo]); break;
+              case 'location': controller.trigger('facebook_location', [bot, message, tempConvo]); break;
+              default: break
+            }
+          } else {
+            controller.receiveMessage(bot, message)  
+          }
         }
+
         // When a user clicks on "Send to Messenger"
-        else if (facebook_message.optin ||
-          (facebook_message.postback && facebook_message.postback.payload === 'optin')) {
+        else if (facebook_message.optin || (facebook_message.postback && facebook_message.postback.payload === 'optin')) {
           message = {
             optin: facebook_message.optin,
             user: facebook_message.sender.id,
@@ -60,11 +68,11 @@ var handler = function (obj) {
             timestamp: facebook_message.timestamp
           }
 
-            // save if user comes from "Send to Messenger"
-            create_user_if_new(facebook_message.sender.id, facebook_message.timestamp)
+          // save if user comes from "Send to Messenger"
+          create_user_if_new(facebook_message.sender.id, facebook_message.timestamp)
+          controller.trigger('facebook_optin', [bot, message])
+        }
 
-            controller.trigger('facebook_optin', [bot, message])
-          }
         // clicks on a postback action in an attachment
         else if (facebook_message.postback) {
           // trigger BOTH a facebook_postback event
@@ -86,6 +94,7 @@ var handler = function (obj) {
           }
           controller.receiveMessage(bot, message)
         }
+
         // message delivered callback
         else if (facebook_message.delivery) {
           message = {
@@ -105,7 +114,7 @@ var handler = function (obj) {
   }
 }
 
-var create_user_if_new = function (id, ts) {
+var create_user_if_new = (id, ts) => {
   controller.storage.users.get(id, function (err, user) {
     if (err) {
       console.log(err)

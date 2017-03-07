@@ -58,3 +58,6 @@ In terms of style, I use [standard style](https://github.com/feross/standard) wi
 
 ## Licence
 Shared under [MIT licence](http://choosealicense.com/licenses/mit/)
+
+## TODOs
+- giphy api replies

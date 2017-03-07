@@ -47,8 +47,8 @@ module.exports = function (controller) {
     'call_to_actions': [
       {
         'type': 'postback',
-        'title': 'Send',
-        'payload': 'send'
+        'title': 'Add',
+        'payload': 'add'
       },
       {
         'type': 'postback',

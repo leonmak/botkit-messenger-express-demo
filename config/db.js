@@ -7,7 +7,7 @@ var db = require('monk')
  * @param  {Object} config
  * @return {Object}
  */
-module.exports = function (config) {
+module.exports = (config) => {
   if (!config || !config.mongoUri) {
     throw new Error('Need to provide mongo address.')
   }
@@ -15,10 +15,9 @@ module.exports = function (config) {
   const Users = db(config.mongoUri).get('users')
   const Channels = db(config.mongoUri).get('channels')
   const Posts = db(config.mongoUri).get('posts')
-  const Blacklist = db(config.mongoUri).get('blacklist')
 
-  var unwrapFromList = function (cb) {
-    return function (err, data) {
+  var unwrapFromList = (cb) => {
+    return (err, data) => {
       if (err) return cb(err)
       cb(null, data)
     }
@@ -26,10 +25,10 @@ module.exports = function (config) {
 
   return {
     teams: { // must have botkit
-      get: function (id, cb) {
+      get: (id, cb) => {
         Teams.findOne({id: id}, unwrapFromList(cb))
       },
-      save: function (data, cb) {
+      save: (data, cb) => {
         Teams.findOneAndUpdate({
           id: data.id
         }, data, {
@@ -37,16 +36,16 @@ module.exports = function (config) {
           new: true
         }, cb)
       },
-      all: function (cb) {
+      all: (cb) => {
         Teams.find({}, cb)
       }
     },
 
     users: {
-      get: function (id, cb) {
+      get: (id, cb) => {
         Users.findOne({id: id}, unwrapFromList(cb))
       },
-      save: function (data, cb) {
+      save: (data, cb) => {
         Users.findOneAndUpdate({
           id: data.id
         }, data, {
@@ -54,10 +53,10 @@ module.exports = function (config) {
           new: true
         }, cb)
       },
-      find_or_create: function (data, cb) {
+      find_or_create: (data, cb) => {
         Users.findOne({
           id: data.id
-        }, function (err, user) {
+        }, (err, user) => {
           if (err) {
             cb(err)
           }
@@ -74,16 +73,16 @@ module.exports = function (config) {
           }
         })
       },
-      all: function (cb) {
-        Users.find({}, cb)
+      all: (cb) => {
+        return Users.find({}, cb)
       }
     },
 
     channels: {
-      get: function (id, cb) {
+      get: (id, cb) => {
         Channels.findOne({id: id}, unwrapFromList(cb))
       },
-      save: function (data, cb) {
+      save: (data, cb) => {
         Channels.findOneAndUpdate({
           id: data.id
         }, data, {
@@ -91,45 +90,30 @@ module.exports = function (config) {
           new: true
         }, cb)
       },
-      all: function (cb) {
+      all: (cb) => {
         Channels.find({}, cb)
       }
     },
 
     posts: {
-      get: function (id, cb) {
+      count: () => {
+        return Posts.count()
+      },
+      get: (id, cb) => {
         Posts.findOne({id: id}, unwrapFromList(cb))
       },
-      save: function (data, cb) {
-        Posts.findOneAndUpdate({
+      save: (data, cb) => {
+        return Posts.findOneAndUpdate({
           id: data.id
         }, data, {
           upsert: true,
           new: true
         }, cb)
       },
-      all: function (cb) {
+      all: (cb) => {
         Posts.find({}, cb)
       }
-    },
-
-    blacklist: {
-      get: function (id, cb) {
-        Blacklist.findOne({id: id}, unwrapFromList(cb))
-      },
-      save: function (data, cb) {
-        Blacklist.findOneAndUpdate({
-          id: data.id
-        }, data, {
-          upsert: true,
-          new: true
-        }, cb)
-      },
-      all: function (cb) {
-        Blacklist.find({}, cb)
-      }
     }
-
   }
 }
 /* eslint-disable brace-style */
